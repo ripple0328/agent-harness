@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
+  "actor": "agent-tool-name",
+  "workflow_or_role": "implement-spec | qa-verifier | review | other",
+  "task_type": "feature",
+  "input_refs": [
+    "specs/features/example.md"
+  ],
+  "output_refs": [
+    "specs/features/example.md",
+    "PR URL or branch"
+  ],
+  "files_changed_count": 0,
+  "files_changed_summary": {
+    "ui": 0,
+    "api": 0,
+    "data": 0,
+    "infra": 0,
+    "harness_docs": 0
+  },
+  "commands_run": [
+    {
+      "command": "npm test",
+      "result": "not_run",
+      "summary": "No test runner configured yet."
+    }
+  ],
+  "tool_capabilities_used": [
+    "repo-search",
+    "terminal",
+    "proposed-patch"
+  ],
+  "evidence_artifacts": [
+    "PR Attention Packet",
+    "QA Impact Packet"
+  ],
+  "human_interventions": [
+    {
+      "type": "correction",
+      "summary": "Reviewer asked for negative permission case.",
+      "feedback_event_ref": ".harness/reviews/YYYY-MM-DD-permission-negative-tests.md"
+    }
+  ],
+  "self_reported_confidence": "medium",
+  "known_gaps": [
+    "Browser verification not run because no local dev server was available."
+  ],
+  "harness_follow_up": [
+    "rule-gap"
+  ],
+  "signal_trigger": {
+    "started": true,
+    "category": "missing-evidence",
+    "outcome": "proposed",
+    "record_ref": ".harness/reviews/YYYY-MM-DD-permission-negative-tests.md"
+  }
+}

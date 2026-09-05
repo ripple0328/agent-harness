@@ -1,0 +1,27 @@
+{
+  "name": "agent-harness",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Portable evidence-driven software delivery and harness improvement workflows.",
+  "scripts": {
+    "qa:trace": "node scripts/trace-acceptance-criteria.mjs",
+    "qa:trace:gate": "node scripts/trace-acceptance-criteria.mjs --gate",
+    "qa:brief": "node scripts/qa-brief.mjs",
+    "harness:audit": "node scripts/harness-audit.mjs",
+    "harness:research:check": "node scripts/research-knowledge-check.mjs",
+    "test:research-knowledge": "node --test test/research-knowledge-check.test.mjs",
+    "test": "node --test test/*.test.mjs",
+    "signals:run": "node scripts/capture-signals.mjs run",
+    "signals:record": "node scripts/capture-signals.mjs record",
+    "signals:summary": "node scripts/capture-signals.mjs summary",
+    "signals:prune": "node scripts/capture-signals.mjs prune",
+    "context:build": "node scripts/context-pack.mjs",
+    "harness:evaluate": "node scripts/evaluate-harness.mjs",
+    "check": "npm test && npm run qa:trace:gate && npm run harness:research:check && npm run harness:audit",
+    "test:context": "node --test test/context-pack.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

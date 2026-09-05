@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "synthetic-demo-not-production-evidence",
+  "baseline": "demo-v1",
+  "candidate": "demo-v2",
+  "executor": "synthetic-fixtures",
+  "task_set": "demo-fixed-cases",
+  "grader": "fixture-assertions",
+  "run_ref": "synthetic-example",
+  "holdout_isolated": true,
+  "grader_calibrated": true,
+  "min_trials": 1,
+  "budgets": {
+    "max_duration_ms": 200,
+    "max_cost_units": 30,
+    "cost_unit": "synthetic-units"
+  },
+  "cases": [
+    {
+      "id": "motivating",
+      "suite": "motivating",
+      "trials": [
+        {
+          "id": "one",
+          "baseline": {
+            "success": false,
+            "invariants_preserved": true,
+            "false_positive": false,
+            "duration_ms": 100,
+            "cost_units": 20,
+            "evidence_ref": "synthetic-fixture-only"
+          },
+          "candidate": {
+            "success": true,
+            "invariants_preserved": true,
+            "false_positive": false,
+            "duration_ms": 100,
+            "cost_units": 20,
+            "evidence_ref": "synthetic-fixture-only"
+          }
+        }
+      ]
+    },
+    {
+      "id": "regression",
+      "suite": "regression",
+      "trials": [
+        {
+          "id": "one",
+          "baseline": {
+            "success": true,
+            "invariants_preserved": true,
+            "false_positive": false,
+            "duration_ms": 100,
+            "cost_units": 20,
+            "evidence_ref": "synthetic-fixture-only"
+          },
+          "candidate": {
+            "success": true,
+            "invariants_preserved": true,
+            "false_positive": false,
+            "duration_ms": 100,
+            "cost_units": 20,
+            "evidence_ref": "synthetic-fixture-only"
+          }
+        }
+      ]
+    },
+    {
+      "id": "holdout",
+      "suite": "holdout",
+      "trials": [
+        {
+          "id": "one",
+          "baseline": {
+            "success": true,
+            "invariants_preserved": true,
+            "false_positive": false,
+            "duration_ms": 100,
+            "cost_units": 20,
+            "evidence_ref": "synthetic-fixture-only"
+          },
+          "candidate": {
+            "success": true,
+            "invariants_preserved": true,
+            "false_positive": false,
+            "duration_ms": 100,
+            "cost_units": 20,
+            "evidence_ref": "synthetic-fixture-only"
+          }
+        }
+      ]
+    }
+  ]
+}

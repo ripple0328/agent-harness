@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "event_id": "example-event",
+  "source": "example-adapter",
+  "run_id": "example-run",
+  "revision": "example-snapshot",
+  "type": "review_rework",
+  "label": "missing-boundary-case",
+  "outcome": "unknown",
+  "timestamp": "2026-09-05T00:00:00Z"
+}

@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Harness Run Trace",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "timestamp",
+    "actor",
+    "workflow_or_role",
+    "task_type",
+    "output_refs",
+    "commands_run",
+    "known_gaps",
+    "harness_follow_up"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "timestamp": { "type": "string" },
+    "actor": { "type": "string" },
+    "workflow_or_role": { "type": "string" },
+    "task_type": {
+      "type": "string",
+      "enum": ["feature", "fix", "docs", "infra", "qa", "review", "harness", "other"]
+    },
+    "input_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "output_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "files_changed_count": { "type": "integer", "minimum": 0 },
+    "files_changed_summary": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "commands_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "result"],
+        "properties": {
+          "command": { "type": "string" },
+          "result": { "type": "string", "enum": ["pass", "fail", "not_run"] },
+          "summary": { "type": "string" }
+        }
+      }
+    },
+    "tool_capabilities_used": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "code-edit",
+          "terminal",
+          "repo-search",
+          "browser",
+          "design-source",
+          "pr-issue",
+          "bounded-loop",
+          "scheduled-run",
+          "monitor",
+          "sub-agent",
+          "proposed-patch",
+          "other"
+        ]
+      }
+    },
+    "evidence_artifacts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "human_interventions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "summary"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["clarification", "correction", "scope_change", "review_finding", "qa_finding", "other"]
+          },
+          "summary": { "type": "string" },
+          "feedback_event_ref": { "type": "string" }
+        }
+      }
+    },
+    "self_reported_confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "known_gaps": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "harness_follow_up": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "none",
+          "rule-gap",
+          "hook-candidate",
+          "eval-candidate",
+          "template-update",
+          "role-update",
+          "workflow-update",
+          "trigger-candidate"
+        ]
+      }
+    },
+    "signal_trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "started": { "type": "boolean" },
+        "category": { "type": "string" },
+        "outcome": {
+          "type": "string",
+          "enum": ["not_applicable", "completed", "proposed", "escalated", "deferred"]
+        },
+        "record_ref": { "type": "string" }
+      }
+    }
+  }
+}

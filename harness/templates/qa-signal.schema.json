@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/agent-harness/qa-signal.schema.json",
+  "title": "QA Signal",
+  "description": "Small producer facts. Legacy metadata-free signals remain readable but cannot verify quality. Gate policy additionally requires revision, runId, and completedAt, with exact expected identity and bounded age.",
+  "type": "object",
+  "required": ["area", "status", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "area": { "type": "string", "minLength": 1, "maxLength": 100, "pattern": "^[a-z0-9][a-z0-9._-]*$", "description": "One unique project-defined dimension per invocation, such as correctness, reliability, security, or maintainability. Shards must aggregate in their producer or use distinct required areas." },
+    "status": { "type": "string", "enum": ["passed", "failed", "warning", "skipped", "unknown", "not-verified"] },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 2000, "description": "Reason a check was skipped, unavailable, or qualified; include residual risk and next owner in the QA packet." },
+    "revision": { "type": "string", "minLength": 1, "maxLength": 200, "description": "Immutable revision identifier actually checked, compared exactly with caller policy; do not use a moving branch name." },
+    "runId": { "type": "string", "minLength": 1, "maxLength": 200, "description": "Caller-owned execution identity, including attempt identity when runs can be retried." },
+    "completedAt": { "type": "string", "format": "date-time", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$", "description": "UTC completion timestamp with seconds and optional three-digit milliseconds; producer must derive from the actual execution." },
+    "spec": { "type": "string", "maxLength": 500 },
+    "command": { "type": "string", "maxLength": 2000 },
+    "artifacts": { "type": "array", "maxItems": 100, "items": { "type": "string", "maxLength": 2000 } },
+    "harnessFeedback": { "type": "array", "maxItems": 100, "items": { "type": "string", "maxLength": 2000 } },
+    "metrics": {
+      "type": "array", "maxItems": 100,
+      "items": {
+        "type": "object", "required": ["name", "value"], "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "value": { "type": ["string", "number"], "maxLength": 500 },
+          "gate": { "type": "string", "maxLength": 500 },
+          "ok": { "type": "boolean" }
+        }
+      }
+    },
+    "findings": {
+      "type": "array", "maxItems": 100,
+      "items": {
+        "type": "object", "required": ["severity", "text"], "additionalProperties": false,
+        "properties": {
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "text": { "type": "string", "minLength": 1, "maxLength": 2000 }
+        }
+      }
+    },
+    "metadata": { "type": "object", "additionalProperties": true }
+  }
+}

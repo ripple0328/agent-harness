@@ -1,0 +1,71 @@
+# Optional GitHub adapter. Review/pin action revisions for the adopting project.
+# This template is not installed as an active workflow in this repository.
+name: QA Evidence Gate
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+jobs:
+  correctness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run project checks with passive metadata capture
+        id: checks
+        continue-on-error: true
+        env:
+          HARNESS_RUN: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          node scripts/capture-signals.mjs run --label correctness --run-id "$HARNESS_RUN" --revision "$(git rev-parse HEAD)" -- npm test
+      - name: Emit actual check outcome
+        if: always()
+        env:
+          CHECK_OUTCOME: ${{ steps.checks.outcome }}
+          HARNESS_RUN: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          node --input-type=module <<'JS'
+          import {mkdirSync, writeFileSync} from 'node:fs'
+          import {execFileSync} from 'node:child_process'
+          const status = {success:'passed',failure:'failed',skipped:'skipped',cancelled:'skipped'}[process.env.CHECK_OUTCOME] || 'unknown'
+          const signal = {
+            area:'correctness', status, summary:'Project check command outcome',
+            revision:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
+            runId:process.env.HARNESS_RUN, completedAt:new Date().toISOString()
+          }
+          mkdirSync('qa-signal',{recursive:true})
+          writeFileSync('qa-signal/correctness.json', JSON.stringify(signal))
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-evidence
+          path: qa-signal/correctness.json
+          retention-days: 7
+      - name: Preserve failed check job result
+        if: steps.checks.outcome != 'success'
+        run: exit 1
+  qa-gate:
+    runs-on: ubuntu-latest
+    needs: [correctness]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        continue-on-error: true # Missing artifacts remain missing at the gate.
+        with:
+          name: qa-evidence
+          path: evidence/qa-signal
+      - name: Require matching evidence
+        env:
+          HARNESS_RUN: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          node scripts/qa-brief.mjs --signals evidence/qa-signal --gate --revision "$(git rev-parse HEAD)" --run-id "$HARNESS_RUN" --required correctness --out .harness/qa-reports/brief.md --json .harness/qa-reports/brief.json
+      # The full brief includes spec/traceability content. Keep it runner-local;
+      # persist only explicitly selected, redacted decision fields if needed.

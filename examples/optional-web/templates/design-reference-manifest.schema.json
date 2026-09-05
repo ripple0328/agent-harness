@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/agent-harness/design-reference-manifest.schema.json",
+  "title": "Design Reference Manifest",
+  "type": "object",
+  "required": ["spec", "source", "exports"],
+  "additionalProperties": false,
+  "properties": {
+    "spec": {
+      "type": "string",
+      "description": "Feature spec slug."
+    },
+    "source": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Design source type, for example figma, screenshot, prototype, or component-library."
+        },
+        "fileKey": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "exports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "sourceId", "artifact"],
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "artifact": {
+            "type": "string"
+          },
+          "viewport": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "exportedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

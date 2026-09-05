@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Minimal feedback observation",
+  "description": "Opaque metadata only. Use capture-signals.mjs for additional cross-field, timestamp, replay and filesystem checks. Producer assertions are not authenticated.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "source",
+    "run_id",
+    "revision",
+    "type",
+    "label",
+    "outcome",
+    "timestamp"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+    },
+    "label": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+    },
+    "type": {
+      "enum": [
+        "command",
+        "correction",
+        "review_rework",
+        "rollback",
+        "escaped_defect",
+        "release"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "passed",
+        "failed",
+        "unknown"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "exit_code": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 255
+    },
+    "signal": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^SIG[A-Z0-9]+$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "command"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "duration_ms",
+          "exit_code",
+          "signal"
+        ],
+        "oneOf": [
+          {
+            "properties": {
+              "exit_code": {
+                "type": "integer"
+              },
+              "signal": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "exit_code": {
+                "type": "null"
+              },
+              "signal": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

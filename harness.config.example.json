@@ -1,0 +1,51 @@
+{
+  "specsDir": "specs/features",
+  "terminalSpecStatuses": [
+    "done",
+    "retired",
+    "cancelled"
+  ],
+  "testFiles": [
+    {
+      "dir": "src",
+      "patterns": [
+        "\\.(test|spec)\\.[^.]+$"
+      ]
+    },
+    {
+      "dir": "test",
+      "patterns": [
+        "\\.[^.]+$"
+      ]
+    },
+    {
+      "dir": "tests",
+      "patterns": [
+        "\\.[^.]+$"
+      ]
+    }
+  ],
+  "skipDirs": [
+    "node_modules",
+    ".git",
+    "dist",
+    "build",
+    "coverage",
+    "test-results",
+    "vendor"
+  ],
+  "highRiskKeywords": [
+    "authorization",
+    "permission",
+    "credential",
+    "secret",
+    "privacy",
+    "delete",
+    "irreversible",
+    "integrity",
+    "concurrency",
+    "recovery",
+    "compatibility",
+    "untrusted"
+  ]
+}

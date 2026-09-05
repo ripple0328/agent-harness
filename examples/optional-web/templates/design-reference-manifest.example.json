@@ -1,0 +1,19 @@
+{
+  "spec": "example-feature",
+  "source": {
+    "kind": "figma",
+    "fileKey": "example-file-key",
+    "url": "https://www.figma.com/file/example"
+  },
+  "exports": [
+    {
+      "label": "example-feature-empty",
+      "sourceId": "123:456",
+      "artifact": "specs/features/example-feature.design/example-feature-empty.png",
+      "viewport": "desktop",
+      "state": "empty",
+      "notes": "Primary empty state benchmark."
+    }
+  ],
+  "exportedAt": "2026-01-01T00:00:00.000Z"
+}

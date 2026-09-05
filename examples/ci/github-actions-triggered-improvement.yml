@@ -1,0 +1,66 @@
+# Optional manual adapter; replace the vendor placeholder and pin reviewed actions.
+# Select a previously reviewed, redacted artifact authorized for the model provider.
+# The artifact must contain only approved-signal.md, not a raw .harness/ directory.
+name: Propose Harness Improvement
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Run ID containing the reviewed and redacted input artifact
+        required: true
+        type: string
+      artifact_name:
+        description: Approved artifact containing only approved-signal.md
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  propose-improvement:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read explicitly selected approved input
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .harness/approved-input
+
+      - name: Check input boundary
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          directory = Path('.harness/approved-input')
+          files = list(directory.iterdir())
+          expected = directory / 'approved-signal.md'
+          if directory.is_symlink() or files != [expected]:
+              raise SystemExit('Expected exactly one approved signal file')
+          if expected.is_symlink() or not expected.is_file() or not 0 < expected.stat().st_size <= 32768:
+              raise SystemExit('Approved signal must be a regular file of at most 32 KiB')
+          expected.read_text(encoding='utf-8')
+          Path('.harness/reviews').mkdir(parents=True, exist_ok=True)
+          PY
+
+      - name: Run improvement proposer
+        uses: vendor/agent-task-action@v1
+        with:
+          api-key: ${{ secrets.MODEL_API_KEY }}
+          task-file: harness/tasks/improve-harness.md
+          input-file: .harness/approved-input/approved-signal.md
+          mode: propose-only
+          output-file: .harness/reviews/proposed-improvement.md
+
+      # Shape and size checks do not establish redaction or trust. Review the
+      # input before dispatch; the agent must treat its content as untrusted data.
+      # The proposal remains runner-local for subsequent authorized checks and is
+      # discarded with the job. Publication needs an explicit redaction/review
+      # step, approved destination and bounded retention; no automatic comments,
+      # issues, uploads, commits or rule promotion are configured here.

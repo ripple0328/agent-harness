@@ -1,0 +1,30 @@
+# Optional adapter; review and pin action revisions before installation.
+# Provide approved metrics through a project-specific input adapter. An empty
+# checkout has no private run history and cannot establish delivery outcomes.
+name: Harness Audit
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate harness audit
+        run: node scripts/harness-audit.mjs --metrics .harness/run-metrics --days 30 --out .harness/audit/$(date -u +%F).md
+
+      # The report remains in the runner workspace for subsequent authorized
+      # checks and is discarded with the job. Do not commit or upload .harness/.
+      # Persistent reporting needs an explicit adapter that selects and redacts
+      # approved fields, checks destination access, and sets bounded retention.

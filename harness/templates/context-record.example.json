@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "id": "example-context-decision-001",
+  "key": "context.source-integrity",
+  "kind": "decision",
+  "scope": ["."],
+  "text": "Context records are checked against current source hashes before reuse. Replace this illustrative record with a reviewed project fact and compute its actual source hash.",
+  "status": "retracted",
+  "recorded_at": "2026-09-05T00:00:00Z",
+  "verified_at": "2026-09-05T00:00:00Z",
+  "expires_at": "2026-10-05T00:00:00Z",
+  "verified_by": "example-only",
+  "sources": [
+    {
+      "path": "harness/workflows/continuous-context.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ]
+}

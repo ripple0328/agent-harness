@@ -1,0 +1,38 @@
+# Optional adapter; replace the vendor placeholder and pin a reviewed revision.
+# Approve the provider's access to repository data before installation. Configure
+# the adapter to publish only redacted findings, never raw prompts or traces.
+name: AI PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ai-pr-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run AI reviewer
+        uses: vendor/agent-pr-review-action@v1
+        with:
+          api-key: ${{ secrets.MODEL_API_KEY }}
+          prompt-file: harness/templates/ai-pr-review-prompt.md
+          allowed-tools: "git,gh,read-file,search"
+          max-turns: 12
+          summary-comment-header: ai-pr-review
+
+      # Raw review evidence stays in the runner workspace and is discarded with
+      # the job. Do not upload .harness/reviews/. Persistent evidence needs an
+      # explicit selection/redaction adapter, access controls and bounded retention.

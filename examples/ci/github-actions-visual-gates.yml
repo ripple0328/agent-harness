@@ -1,0 +1,75 @@
+# Optional adapter; use synthetic fixtures and review screenshots for sensitive
+# content before enabling artifact uploads. Pin reviewed action revisions.
+name: Visual Gates
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "app/**"
+      - "pages/**"
+      - "specs/features/**"
+      - "harness/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  visual-coverage:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check visual coverage ledger
+        run: npm run visual:coverage
+      - name: Emit visual coverage signal
+        if: always()
+        run: |
+          mkdir -p qa-signal
+          case "${{ job.status }}" in
+            success) signal_status="passed" ;;
+            failure) signal_status="failed" ;;
+            cancelled) signal_status="skipped" ;;
+            *) signal_status="unknown" ;;
+          esac
+          printf '{"area":"visual-coverage","status":"%s","summary":"Visual coverage ledger checked"}\n' "$signal_status" > qa-signal/visual-coverage.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-signal-visual-coverage
+          path: qa-signal/visual-coverage.json
+          retention-days: 7
+
+  visual-regression:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run visual regression
+        run: npm run test:visual
+      - name: Upload visual artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-artifacts
+          path: visual-report/
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Emit visual signal
+        if: always()
+        run: |
+          mkdir -p qa-signal
+          case "${{ job.status }}" in
+            success) signal_status="passed" ;;
+            failure) signal_status="failed" ;;
+            cancelled) signal_status="skipped" ;;
+            *) signal_status="unknown" ;;
+          esac
+          printf '{"area":"visual","status":"%s","summary":"Visual regression completed","artifacts":["visual-regression-artifacts"]}\n' "$signal_status" > qa-signal/visual.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-signal-visual
+          path: qa-signal/visual.json
+          retention-days: 7
